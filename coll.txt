@@ -1,9 +1,22 @@
 Sub ListSheetNames()
+    Dim wb As Workbook
     Dim ws As Worksheet
     Dim i As Integer
+    Dim filePath As String
+    
+    ' Define the file path of the Excel file
+    filePath = "C:\path\to\your\file.xlsx" ' Change this to your actual file path
+    
+    ' Open the workbook
+    Set wb = Workbooks.Open(filePath)
+    
+    ' Start listing sheet names in the active workbook (can adjust to specify a different sheet)
     i = 1
-    For Each ws In ThisWorkbook.Sheets
-        ThisWorkbook.Sheets(1).Cells(i, 1).Value = ws.Name & " IN Equity"
+    For Each ws In wb.Sheets
+        wb.Sheets(1).Cells(i, 1).Value = ws.Name & " IN Equity"
         i = i + 1
     Next ws
+    
+    ' Close the workbook without saving changes
+    wb.Close False
 End Sub
