@@ -1,0 +1,49 @@
+Sub RenameAndMoveExcelFiles()
+    Dim folderPath As String
+    Dim renamedFolderPath As String
+    Dim fso As Object ' Declare as generic Object for late binding
+    Dim file As Object
+    Dim oldName As String
+    Dim newName As String
+    Dim pos As Long
+
+    ' Set the folder path to the current workbook's directory
+    folderPath = ThisWorkbook.Path & "\"
+    
+    ' Create a new folder named "RenamedFiles" within the current folder
+    renamedFolderPath = folderPath & "RenamedFiles\"
+    On Error Resume Next
+    MkDir renamedFolderPath
+    On Error GoTo 0
+
+    ' Create FileSystemObject using late binding
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' Loop through each file in the folder
+    For Each file In fso.GetFolder(folderPath).Files
+        ' Check if the file is an Excel file
+        If file.Name Like "*.xls*" Then
+            oldName = file.Name
+            
+            ' Find the position of " FY" in the file name
+            pos = InStr(oldName, " FY")
+            
+            ' If " FY" is found, rename the file
+            If pos > 0 Then
+                ' Extract the first part of the name up to " FY"
+                newName = Left(oldName, pos - 1)
+                
+                ' Append the file extension to newName
+                newName = newName & Mid(oldName, InStrRev(oldName, "."))
+                
+                ' Move and rename the file to the new folder
+                fso.MoveFile Source:=folderPath & oldName, Destination:=renamedFolderPath & newName
+            End If
+        End If
+    Next file
+    
+    ' Release the object
+    Set fso = Nothing
+    
+    MsgBox "Files renamed and moved successfully to 'RenamedFiles' folder!"
+End Sub
