@@ -1,0 +1,50 @@
+Sub ConsolidateUploadSheets()
+    Dim FolderPath As String
+    Dim FileName As String
+    Dim wbSource As Workbook
+    Dim wsSource As Worksheet
+    Dim wsDest As Worksheet
+    Dim DestWorkbook As Workbook
+    Dim LastRow As Long
+    Dim SheetName As String
+
+    ' Set the folder path
+    FolderPath = "C:\YourFolderPath\" ' Update with your folder path
+
+    ' Create a new workbook to store consolidated sheets
+    Set DestWorkbook = Workbooks.Add
+
+    ' Set the initial file name
+    FileName = Dir(FolderPath & "*.xls*") ' Use * to include .xlsx and .xlsm files
+
+    ' Loop through each file in the folder
+    Do While FileName <> ""
+        ' Open the source workbook
+        Set wbSource = Workbooks.Open(FolderPath & FileName)
+
+        ' Check if the uploadS sheet exists in the workbook
+        On Error Resume Next
+        Set wsSource = wbSource.Sheets("uploadS")
+        On Error GoTo 0
+        
+        If Not wsSource Is Nothing Then
+            ' Copy the uploadS sheet to the destination workbook
+            wsSource.Copy After:=DestWorkbook.Sheets(DestWorkbook.Sheets.Count)
+
+            ' Rename the copied sheet to the source file name (without extension)
+            SheetName = Left(FileName, InStrRev(FileName, ".") - 1)
+            DestWorkbook.Sheets(DestWorkbook.Sheets.Count).Name = SheetName
+        End If
+        
+        ' Close the source workbook
+        wbSource.Close False
+
+        ' Clear wsSource variable for the next iteration
+        Set wsSource = Nothing
+
+        ' Get the next file name
+        FileName = Dir
+    Loop
+
+    MsgBox "Consolidation complete!"
+End Sub

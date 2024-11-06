@@ -1,0 +1,44 @@
+Sub RenameExcelFiles()
+    Dim folderPath As String
+    Dim fso As Object
+    Dim file As Object
+    Dim oldName As String
+    Dim newName As String
+    Dim fileNameParts As Variant
+
+    ' Set the folder path to the current workbook's directory
+    folderPath = ThisWorkbook.Path & "\"
+    
+    ' Create FileSystemObject
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' Loop through each file in the folder
+    For Each file In fso.GetFolder(folderPath).Files
+        ' Check if the file is an Excel file
+        If file.Name Like "*.xls*" Then
+            oldName = file.Name
+            ' Split the file name by underscores or spaces
+            fileNameParts = Split(oldName, "_")
+            
+            ' Use the first part of the name
+            newName = fileNameParts(0)
+            
+            ' Append the extension to newName
+            If Right(oldName, 5) = ".xlsx" Or Right(oldName, 5) = ".xlsm" Then
+                newName = newName & Mid(oldName, InStrRev(oldName, "."))
+            Else
+                newName = newName & Mid(oldName, InStrRev(oldName, "."))
+            End If
+            
+            ' Rename the file if the new name is different
+            If newName <> oldName Then
+                file.Name = newName
+            End If
+        End If
+    Next file
+    
+    ' Release the object
+    Set fso = Nothing
+    
+    MsgBox "Files renamed successfully!"
+End Sub
